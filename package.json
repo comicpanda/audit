@@ -1,0 +1,19 @@
+{
+  "name": "panda-audit",
+  "version": "1.0.0",
+  "description": "in order to update data, run a sql below ```SQL select s.id, s.title, p.file_path as thum, p1.file_path as book from series s inner join pile p on s.thumb_id = p.id  inner join pile p1 on s.book_cover_id = p1.id where s.type = 1 ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/comicpanda/audit.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/comicpanda/audit/issues"
+  },
+  "homepage": "https://github.com/comicpanda/audit#readme"
+}
