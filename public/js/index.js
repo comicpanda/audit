@@ -50,7 +50,7 @@ const bindData = (idx, assignee) => {
     const $checkbox = document.querySelector('.js-checkbox');
     $checkbox.dataset.idx = idx;
     $checkbox.checked = true; 
-    document.querySelector('.js-back-to-list').href = `/?assignee=${assignee}#series-list-view`;
+    document.querySelector('.js-back-to-list').href = `./?assignee=${assignee}#series-list-view`;
     currentAssignee = assignee;
     currentSeriesIdx = idx;
 
@@ -169,7 +169,7 @@ const drawSeriesTable = (data) => {
 }
 
 const goToDetailedView = (ds) => {
-    window.location.href = `/?id=${ds.id}&idx=${ds.idx}&assignee=${currentAssignee}#detailed-view`;
+    window.location.href = `./?id=${ds.id}&idx=${ds.idx}&assignee=${currentAssignee}#detailed-view`;
 }
 
 const setEventsOnSeriesTable = () => {
@@ -399,7 +399,7 @@ const delegatePage = () => {
                 window.localStorage.clear();
                 console.log(err);
                 alert('loadSeriesData : Please try it again.');
-                window.location.href = '/';
+                window.location.href = './';
             });
     } else if (locationHash === '#detailed-view') {
         loadEpisodesData(params.get('id'))
@@ -413,7 +413,7 @@ const delegatePage = () => {
             }).catch(err => {
                 console.log(err);
                 alert('loadEpisodesData : Please try it again.');
-                // window.location.href = `/?assignee=${currentAssignee}#series-list-view`;
+                window.location.href = `./?assignee=${currentAssignee}#series-list-view`;
             });
     }
 }
