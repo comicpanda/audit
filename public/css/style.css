@@ -44,7 +44,7 @@ html, body {
 }
 
 .series-table tbody tr {
-    opacity: 0.9;
+    opacity: 0.8;
 }
 
 .footer__inner {
@@ -69,7 +69,7 @@ html, body {
     background-color: #007bff;
 }
 
-.status-B .badge {
+.status-S .badge {
     color: #fff;
     background-color: #dc3545;
 }
