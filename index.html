@@ -7,16 +7,16 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="./public/css/bootstrap.min.css">
     <link rel="stylesheet" href="./public/css/style.css">
-    <title>Hello, world!</title>
+    <title>Hello, Friend!</title>
     <script ></script>
     <script src="./public/js/assinees.js"></script>
     <script src="./public/js/index.js"></script>
   </head>
   <body>
     <div class="root">
-        <h1 class="mb-5"><a href="/">audit.tapas.io</a></h1>
-        <div class="loading">Loading...</div>
-        <div class="d-none js-view" id="assignee-view">
+        <div class="loading js-loading">Loading...</div>
+        <div class="d-none" id="assignee-view">
+            <h1 class="mb-5"><a href="/">audit.tapas.io</a></h1>
             <form action="/#series-list-view">
                 <div class="form-group">
                     <label for="assignees">Select your name : </label> 
@@ -25,7 +25,19 @@
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
-        <div class="d-none js-view" id="series-list-view">
+        <div class="d-none" id="series-list-view">
+            <div class="keymap">
+                Shortcuts - 
+               <span class="itme"><kbd>j</kbd></span>: down
+               <span class="itme"><kbd>k</kbd></span>: up
+               <span class="itme"><kbd>x</kbd></span>: select
+               <span class="itme"><kbd>enter</kbd></span>: go to episodes
+               <span class="itme"><kbd>b</kbd></span>: block
+               <span class="itme"><kbd>s</kbd></span>: spam 
+               <span class="itme"><kbd>p</kbd></span>: pass
+            </div>
+            <h1 class="mb-5"><a href="/">audit.tapas.io</a></h1>
+            <h3 class="mb-3">Thank you for reviewing contents <span class="js-assignee-name"></span>!</h3>
             <label>Filter : </label>
             <select id="status-filter">
                 <option value="A">ALL</option>
@@ -38,13 +50,20 @@
                 <span class="badge badge-light">R:eady</span>, 
                 <span class="badge badge-primary">B:lock</span>, 
                 <span class="badge badge-danger">S:pam</span>, 
-                <span class="badge badge-success">P:ass</span>,
+                <span class="badge badge-success">P:ass</span>
             </p>
+            <div class="alert alert-success">
+                <code>Tips!</code> Use keyboard shortcuts instead of mouse! It will save tons of your time!<br>
+                Select item(s) first using <kbd>x</kbd> before marking. Or using <kbd>j (or ↓)</kbd> or <kbd>k (or ↑)</kbd><br> 
+                Select <kbd>b</kbd> if you think a series is mature content.(Will be blocked on the Apps.)<br>
+                Select <kbd>s</kbd> if you think a series is garbage content. (Will be deleted or blocked.)<br>
+                Select <kbd>p</kbd> if you think a series is okay.<br>
+            </div>
             <p class="counts"></p>
             <table class="table series-table">
                 <thead>
                     <tr>
-                        <th style="width:2%;"><input type="checkbox" disabled></th>
+                        <th style="width:2%;"><input type="checkbox" class="js-all-checkbox"></th>
                         <th style="width:5%;">SeriesID</th>
                         <th style="width:85%;">Title</th>
                         <th style="width:8%;">Status</th>
@@ -53,8 +72,32 @@
                 <tbody></tbody>
             </table>
         </div>
+        <div class="d-none" id="detailed-view">
+            <div class="keymap">
+                Shortcuts - 
+                <span class="item"><kbd>u</kbd>: go back to list </span>
+                <span class="item"><kbd>h</kbd>: previous series</span>
+                <span class="item"><kbd>l</kbd>: next series</span>
+                <span class="item"><kbd>j</kbd>: page down</span>
+                <span class="item"><kbd>k</kbd>: page up</span>
+                <span class="item"><kbd>b</kbd>: block</span>
+                <span class="item"><kbd>s</kbd>: spam </span>
+                <span class="item"><kbd>p</kbd>: pass</span>
+            </div>
+            <div class="alert alert-success" role="alert">
+                <code>Tips!</code> Use keyboard shortcuts instead of mouse! It will save tons of your time!<br>
+                Highly recommend using <kbd>j</kbd> or <kbd>k</kbd>!<br>
+                Select <kbd>p</kbd> if you want to go back previous series<br>
+                Select <kbd>b</kbd> if you think a series is mature content.(Will be blocked on the Apps.)<br>
+                Select <kbd>s</kbd> if you think a series is garbage content. (Will be deleted or blocked.)<br>
+                Select <kbd>p</kbd> if you think a series is okay.<br>
+            </div>
+            <a href="#" class="js-back-to-list">⃪ go back to list</a>
+            <input type="checkbox" class="js-checkbox" disabled >
+            <div class="episode-grid"></div>
+        </div>
     </div>
-    <footer class="footer js-series-list-view-footer js-footer d-none">
+    <footer class="footer js-series-list-view-footer d-none">
         <div class="footer__inner">
             <div class="footer__info">
                 <span class="num">0</span> selected <br>
@@ -62,12 +105,29 @@
                 or <a href="#" class="js-filtering" data-selector="all">all</a> items
             </div>
             <div class="footer__btns">
+                <span class="loading js-saving d-none">Saving....</span>
                 <button class="btn btn-success mr-3" data-status="P">Pass</button>
                 <button class="btn btn-primary mr-3" data-status="B">Block</button>
                 <button class="btn btn-danger" data-status="S">Spam</button>
             </div>
         </div>
     </footer>
+    <footer class="footer js-detailed-view-footer d-none">
+        <div class="footer__inner">
+            <div class="footer__info">
+                <span class="js-series-title"></span> <span class="js-status-badge badge"></span>
+            </div>
+            <div class="footer__btns">
+                <span class="loading js-saving d-none">Saving....</span>
+                <button class="btn btn-info mr-3" data-nav="prev">Prev Series</button>
+                <button class="btn btn-info mr-3" data-nav="next">Next Series</button>
+                <button class="btn btn-success mr-3" data-status="P">Pass</button>
+                <button class="btn btn-primary mr-3" data-status="B">Block</button>
+                <button class="btn btn-danger" data-status="S">Spam</button>
+            </div>
+        </div>
+    </footer>
+    <div id="blank" class="blank"></div>
     <script>init();</script>
   </body>
 </html>
