@@ -58,8 +58,16 @@ const bindData = (idx, assignee) => {
     const pos = series.map(s => s.idx).indexOf(currentSeriesIdx);
     document.querySelector('.js-series-title').innerHTML = series[pos].title;
     const $badge = document.querySelector('.js-status-badge');
-    $badge.innerHTML = series[pos].status; 
-    $badge.parentElement.classList.add(`status-${series[pos].status}`)
+    const updatedData = window.localStorage.getItem('updatedData');
+    let status;
+    if (updatedData !== null) {
+        status = JSON.parse(updatedData)[idx];
+    } 
+    if (status === undefined) {
+        status = series[pos].status; 
+    }
+    $badge.innerHTML = status; 
+    $badge.parentElement.classList.add(`status-${status}`)
 }
 
 const loadEpisodesData = async (seriesId) => 
@@ -69,10 +77,10 @@ const loadSeriesData = async (assignee) => {
     const db = window.localStorage;
     let seriesData = null;
 
-    if (db.getItem('updated') === null) {
+    if (db.getItem('updatedData') === null) {
         seriesData = db.getItem(assignee);
     } else {
-        db.removeItem('updated');
+        db.removeItem('updatedData');
     }
 
     if (seriesData === null) {
@@ -232,7 +240,11 @@ const updateStatus = (status, callback) => {
             }).then(res => {
                 $saving.classList.add('d-none');
                 const db = window.localStorage;
-                db.setItem('updated', 'true');
+                let updatedData = JSON.parse(db.getItem('updatedData') || "{}");
+                body.forEach(b => {
+                    updatedData[b.range] = b.status;
+                });
+                db.setItem('updatedData', JSON.stringify(updatedData));
                 callback.call(this, {status});
                 if (!onDetailedView) {
                     $checkes.forEach($checkbox => $checkbox.checked = false);
@@ -399,7 +411,7 @@ const delegatePage = () => {
                 window.localStorage.clear();
                 console.log(err);
                 alert('loadSeriesData : Please try it again.');
-                window.location.href = './';
+                // window.location.href = './';
             });
     } else if (locationHash === '#detailed-view') {
         loadEpisodesData(params.get('id'))

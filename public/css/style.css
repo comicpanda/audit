@@ -37,6 +37,7 @@ html, body {
 .points {
     border-left: 5px solid #F64656;
     opacity: 1 !important;
+    background-color: #f2f2f2;
 }
 
 .points input[type=checkbox] {
@@ -44,7 +45,6 @@ html, body {
 }
 
 .series-table tbody tr {
-    opacity: 0.8;
 }
 
 .footer__inner {
