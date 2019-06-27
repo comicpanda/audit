@@ -24,5 +24,6 @@ const assigneeData = [
     {id: '22', name : 'Leigha'},
     {id: '23', name : 'Charlie'},
     {id: '24', name : 'Han'},
-    {id: '25', name : 'Nim'}
+    {id: '25', name : 'Nim'},
+    {id: '26', name : 'Clarissa'}
 ];

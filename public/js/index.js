@@ -305,7 +305,7 @@ const navigate = (go) => {
     } else if (go === 'enter') {
         goToDetailedView($trs[currentPos].querySelector('a.title').dataset);
     } else if (go === 'pageDown' || go === 'pageUp') {
-        window.scrollBy(0, document.documentElement.clientHeight * (go === 'pageUp' ? -1 : 1));
+        window.scrollBy(0, document.documentElement.clientHeight - 100 * (go === 'pageUp' ? -1 : 1));
     } else if (go === 'prevSeries' || go === 'nextSeries') {
         moveToSeries(go === 'nextSeries');
     } else if (go === 'goBackToList') {
