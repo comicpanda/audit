@@ -136,6 +136,10 @@ const drawEpisodeContents = (data) => {
         episodes += `<div class="item nsfw_${ep.nsfw_kind}"><a href="https://tapas.io/episode/${ep.id}" target="_blank"><img class="img" src="${blankSrc}" data-src="https://d30womf5coomej.cloudfront.net/${ep.file_path.replace('.','_z.')}" width=200 height=${ep.height*200/ep.width}></a></div>`;
     });
 
+    if (data.length === 0) {
+        episodes = '<div>No episodes. Please press "p"</div>';
+    }
+
     $grid.innerHTML += episodes;
 }
 
@@ -310,7 +314,7 @@ const navigate = (go) => {
     } else if (go === 'enter') {
         goToDetailedView($trs[currentPos].querySelector('a.title').dataset);
     } else if (go === 'pageDown' || go === 'pageUp') {
-        window.scrollBy(0, document.documentElement.clientHeight - 100 * (go === 'pageUp' ? -1 : 1));
+        window.scrollBy(0, (document.documentElement.clientHeight - 100) * (go === 'pageUp' ? -1 : 1));
     } else if (go === 'prevSeries' || go === 'nextSeries') {
         moveToSeries(go === 'nextSeries');
     } else if (go === 'goBackToList') {
@@ -454,6 +458,7 @@ const delegatePage = () => {
 
                 $wipTBody.innerHTML = tbody;
                 showView(locationHash);
+            <p</pa></p>
             }).catch(err => {
                 console.log(err);
                 alert('loadAllData : Please try it again.');
