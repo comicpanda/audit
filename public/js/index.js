@@ -458,7 +458,6 @@ const delegatePage = () => {
 
                 $wipTBody.innerHTML = tbody;
                 showView(locationHash);
-            <p</pa></p>
             }).catch(err => {
                 console.log(err);
                 alert('loadAllData : Please try it again.');
