@@ -4,6 +4,7 @@ let currentPos = 0;
 let maxPos = -1;
 let currentAssignee = -1;
 let currentSeriesIdx = -1;
+let sheetURL = 'https://spreadsheets.google.com/feeds/list/1GRzc5BMG8F_y9ZsB8Ed0crSIQ5HJpUwM1qsu4mD5l68/default/public/values?alt=json';
 
 const showView = (id) => {
     const viewId = id.replace('#', '');
@@ -73,6 +74,8 @@ const bindData = (idx, assignee) => {
 const loadEpisodesData = async (seriesId) => 
     await fetchData(`https://audit.tapas.io/series/${seriesId}`).then(data => data);
 
+const loadAllData = async () => await fetchData(sheetURL).then(data => data)
+
 const loadSeriesData = async (assignee) => {
     const db = window.localStorage;
     let seriesData = null;
@@ -85,18 +88,18 @@ const loadSeriesData = async (assignee) => {
 
     if (seriesData === null) {
         // seriesData = await fetchData('./public/data.json')
-        seriesData = await fetchData('https://spreadsheets.google.com/feeds/list/1GRzc5BMG8F_y9ZsB8Ed0crSIQ5HJpUwM1qsu4mD5l68/default/public/values?alt=json')
-        .then(data => {
-            const list = data.feed.entry.filter(entry => entry.gsx$assignee.$t === assignee)
-                .map(filteredData => ({
-                    idx: filteredData.gsx$idx.$t,
-                    id: filteredData.gsx$id.$t,
-                    title: escapeHtml(filteredData.gsx$title.$t),
-                    status: filteredData.gsx$status.$t || 'R',
-                }));
-            db.setItem(assignee, JSON.stringify(list));
-            return list;
-        });
+        seriesData = await loadAllData()
+            .then(data => {
+                const list = data.feed.entry.filter(entry => entry.gsx$assignee.$t === assignee)
+                    .map(filteredData => ({
+                        idx: filteredData.gsx$idx.$t,
+                        id: filteredData.gsx$id.$t,
+                        title: escapeHtml(filteredData.gsx$title.$t),
+                        status: filteredData.gsx$status.$t || 'R',
+                    }));
+                db.setItem(assignee, JSON.stringify(list));
+                return list;
+            });
         return seriesData;
     } else {
         return JSON.parse(seriesData);
@@ -130,20 +133,20 @@ const drawEpisodeContents = (data) => {
     let episodes = '';
 
     data.forEach(ep => {
-        episodes += `<div class="item"><a href="https://tapas.io/episode/${ep.id}" target="_blank"><img class="img" src="${blankSrc}" data-src="https://d30womf5coomej.cloudfront.net/${ep.file_path.replace('.','_z.')}" width=200 height=${ep.height*200/ep.width}></a></div>`;
+        episodes += `<div class="item nsfw_${ep.nsfw_kind}"><a href="https://tapas.io/episode/${ep.id}" target="_blank"><img class="img" src="${blankSrc}" data-src="https://d30womf5coomej.cloudfront.net/${ep.file_path.replace('.','_z.')}" width=200 height=${ep.height*200/ep.width}></a></div>`;
     });
 
     $grid.innerHTML += episodes;
 }
 
 const drawSeriesTable = (data) => {
-    const $seriesTBody = document.querySelector('.series-table tbody');
+    const $seriesTBody = document.querySelector('.js-series-table tbody');
     let tbody = '';
     data.forEach(series => {
         tbody += `<tr class="status-${series.status}">
             <td><input class="checkbox js-a-checkbox" type="checkbox" data-idx="${series.idx}"></td>
-            <td><a href="https://tapas.io/series/${series.id}" target="_blank">${series.id}</a</td>
-            <td><a href="#" data-id="${series.id}" data-idx="${series.idx}" class="title" title="${series.title}">${series.title}</a</td>
+            <td><a href="https://tapas.io/series/${series.id}" target="_blank">${series.id}</a></td>
+            <td><a href="#" data-id="${series.id}" data-idx="${series.idx}" class="title" title="${series.title}">${series.title}</a></td>
             <td><span class="badge">${series.status}</span></td>
         </tr>`;
         maxPos++;
@@ -157,6 +160,7 @@ const drawSeriesTable = (data) => {
 
     document.getElementById('status-filter').onchange = function () {
         const trs = Array.from($trs);
+        listed = total;
         trs.forEach(tr => {
             tr.classList.remove('d-none');    
         });
@@ -164,8 +168,9 @@ const drawSeriesTable = (data) => {
             const filteredTrs = trs.filter(tr => !tr.classList.contains(`status-${this.value}`));
             filteredTrs.forEach(tr => tr.classList.add('d-none'));
             listed = total - filteredTrs.length;
-            updateCounts(total, listed);
         }
+        
+        updateCounts(total, listed);
     }
 
     document.querySelector('.js-all-checkbox').onchange = function (e) {
@@ -426,6 +431,32 @@ const delegatePage = () => {
                 console.log(err);
                 alert('loadEpisodesData : Please try it again.');
                 window.location.href = `./?assignee=${currentAssignee}#series-list-view`;
+            });
+    } else if (locationHash === '#wip') {
+        loadAllData()
+            .then(data => {
+
+                const list = data.feed.entry;
+                const total = list.length;
+
+                const pass = list.filter(entry => entry.gsx$status.$t === 'P').length;
+                const block = list.filter(entry => entry.gsx$status.$t === 'B').length; 
+                const spam = list.filter(entry => entry.gsx$status.$t === 'S').length; 
+                const ready = list.filter(entry => entry.gsx$status.$t === '').length; 
+
+                const $wipTBody = document.querySelector('.js-status-table tbody');
+                const tbody = `<tr> <td>Total</td><td>${total}</td></tr>
+                    <tr> <td>Ready</td><td>${ready}</td></tr> 
+                    <tr> <td>Pass</td><td>${pass}</td></tr> 
+                    <tr> <td>Block</td><td>${block}</td></tr> 
+                    <tr> <td>Spam</td><td>${spam}</td></tr> 
+                `;
+
+                $wipTBody.innerHTML = tbody;
+                showView(locationHash);
+            }).catch(err => {
+                console.log(err);
+                alert('loadAllData : Please try it again.');
             });
     }
 }

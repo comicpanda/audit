@@ -91,6 +91,13 @@ html, body {
 .episode-grid .item {
     margin: 0 0 10px;
 }
+.episode-grid .item.nsfw_1:before {
+    content: "NSFW";
+    background: #F64656;
+    color: white;
+    padding: 3px;
+    border-radius: 3px;
+}
 .episode-grid .img {
     max-width: 100%;
     /* transition: transform .2s; */
