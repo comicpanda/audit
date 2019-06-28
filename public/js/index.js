@@ -439,22 +439,27 @@ const delegatePage = () => {
     } else if (locationHash === '#wip') {
         loadAllData()
             .then(data => {
-
-                const list = data.feed.entry;
-                const total = list.length;
-
-                const pass = list.filter(entry => entry.gsx$status.$t === 'P').length;
-                const block = list.filter(entry => entry.gsx$status.$t === 'B').length; 
-                const spam = list.filter(entry => entry.gsx$status.$t === 'S').length; 
-                const ready = list.filter(entry => entry.gsx$status.$t === '').length; 
-
                 const $wipTBody = document.querySelector('.js-status-table tbody');
-                const tbody = `<tr> <td>Total</td><td>${total}</td></tr>
-                    <tr> <td>Ready</td><td>${ready}</td></tr> 
-                    <tr> <td>Pass</td><td>${pass}</td></tr> 
-                    <tr> <td>Block</td><td>${block}</td></tr> 
-                    <tr> <td>Spam</td><td>${spam}</td></tr> 
-                `;
+                const list = data.feed.entry;
+                let tbody = '';
+                const isAssigned = (entry, status, id) => entry.gsx$status.$t === status && 
+                    (id < 0 || entry.gsx$assignee.$t === id);
+
+                [{id: '-1', name : 'All'}].concat(assigneeData).forEach(m => {
+                    let pass = list.filter(entry => isAssigned(entry, 'P', m.id)).length;
+                    let block = list.filter(entry => isAssigned(entry, 'B', m.id)).length; 
+                    let spam = list.filter(entry => isAssigned(entry, 'S', m.id)).length; 
+                    let ready = list.filter(entry => isAssigned(entry, '', m.id)).length; 
+                    let total = pass + block + spam + ready;
+
+                    tbody += 
+                    `<tr> 
+                    <td>${m.name}</td><td>${total}</td><td>${ready}</td><td>${pass}</td><td>${block}</td><td>${spam}</td>
+                    <td>${Math.round((total - ready )/ total * 100)}%</td>
+                    </tr> 
+                    `;
+
+                })
 
                 $wipTBody.innerHTML = tbody;
                 showView(locationHash);
