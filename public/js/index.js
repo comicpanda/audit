@@ -127,6 +127,31 @@ const setObserve = () => {
     document.querySelectorAll('.img').forEach($img => observer.observe($img));
 }
 
+const drawStatus = (data) => {
+    const $wipTBody = document.querySelector('.js-status-table tbody');
+    const list = data.feed.entry;
+    let tbody = '';
+    const isAssigned = (entry, status, id) => entry.gsx$status.$t === status && 
+        (id < 0 || entry.gsx$assignee.$t === id);
+
+    [{id: '-1', name : 'All'}].concat(assigneeData).forEach(m => {
+        let pass = list.filter(entry => isAssigned(entry, 'P', m.id)).length;
+        let block = list.filter(entry => isAssigned(entry, 'B', m.id)).length; 
+        let spam = list.filter(entry => isAssigned(entry, 'S', m.id)).length; 
+        let ready = list.filter(entry => isAssigned(entry, '', m.id)).length; 
+        let total = pass + block + spam + ready;
+
+        tbody += 
+        `<tr>
+            <td>${m.name}</td><td>${total}</td>
+            <td>${ready}</td><td>${pass}</td>
+            <td>${block}</td><td>${spam}</td>
+            <td>${Math.round((total - ready ) / total * 100)}%</td>
+        </tr>`; 
+    });
+
+    $wipTBody.innerHTML = tbody;
+}
 const drawEpisodeContents = (data) => {
     const $grid = document.querySelector('.episode-grid');
     const blankSrc = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mO8UQ8AAjUBWXO9i8oAAAAASUVORK5CYII=';
@@ -233,7 +258,7 @@ const updateStatus = (status, callback) => {
     if ($checkes.length > 0) {
         const onDetailedView = $checkes[0].classList.contains('js-checkbox');
         const statusLabel = (status === 'P' ? 'Pass' : (status === 'B' ? 'Block' : 'Spam'));
-        if(confirm(`${statusLabel} - Confirm?`)) {
+        // if(confirm(`${statusLabel} - Confirm?`)) {
             const $saving = document.querySelector(`.js-${onDetailedView ? 'detailed' : 'series-list'}-view-footer .js-saving`);
             $saving.classList.remove('d-none');
             let body = [];
@@ -263,7 +288,7 @@ const updateStatus = (status, callback) => {
                 console.error(err);
                 alert('Error. Please try it again. : updateStatus');
             });
-        }
+        // }
     } else {
         alert('Select a series or more..');
     }
@@ -439,30 +464,8 @@ const delegatePage = () => {
     } else if (locationHash === '#wip') {
         loadAllData()
             .then(data => {
-                const $wipTBody = document.querySelector('.js-status-table tbody');
-                const list = data.feed.entry;
-                let tbody = '';
-                const isAssigned = (entry, status, id) => entry.gsx$status.$t === status && 
-                    (id < 0 || entry.gsx$assignee.$t === id);
-
-                [{id: '-1', name : 'All'}].concat(assigneeData).forEach(m => {
-                    let pass = list.filter(entry => isAssigned(entry, 'P', m.id)).length;
-                    let block = list.filter(entry => isAssigned(entry, 'B', m.id)).length; 
-                    let spam = list.filter(entry => isAssigned(entry, 'S', m.id)).length; 
-                    let ready = list.filter(entry => isAssigned(entry, '', m.id)).length; 
-                    let total = pass + block + spam + ready;
-
-                    tbody += 
-                    `<tr> 
-                    <td>${m.name}</td><td>${total}</td><td>${ready}</td><td>${pass}</td><td>${block}</td><td>${spam}</td>
-                    <td>${Math.round((total - ready )/ total * 100)}%</td>
-                    </tr> 
-                    `;
-
-                })
-
-                $wipTBody.innerHTML = tbody;
                 showView(locationHash);
+                drawStatus(data);
             }).catch(err => {
                 console.log(err);
                 alert('loadAllData : Please try it again.');
