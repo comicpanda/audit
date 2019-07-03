@@ -1,6 +1,6 @@
 const assigneeData = [
-    // {id: '0', name : 'Suzy'},
-    // {id: '1', name : 'Yoon'},
+    {id: '0', name : 'M'},
+    {id: '1', name : 'C'}
     // {id: '2', name : 'Cain'},
     // {id: '3', name : 'Michael'},
     // {id: '2', name : 'Tessa'},
