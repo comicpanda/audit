@@ -162,7 +162,7 @@ const drawEpisodeContents = (data) => {
     });
 
     if (data.length === 0) {
-        episodes = '<div>No episodes. Please press "p"</div>';
+        episodes = '<div>No episodes. Please press "p" or skip it "l" </div>';
     }
 
     $grid.innerHTML += episodes;
@@ -416,9 +416,17 @@ const startShortcutsForListNav = () => {
     };
 }
 
-const updateAssigneeName = () => {
+const updateViews = () => {
     document.querySelector('.js-assignee-name').innerText = assigneeData[currentAssignee]['name'];
+    const ds = JSON.parse(window.localStorage.getItem("LP") || '{}');
+    if (ds.id) {
+        const $goTo = document.querySelector('.js-go-to-last');
+        $goTo.querySelector('a').href = `./?id=${ds.id}&idx=${ds.idx}&assignee=${ds.assignee}#detailed-view`;
+        $goTo.classList.remove('d-none');
+    }
 }
+
+const rememberLastPosition = (params) => window.localStorage.setItem("LP", JSON.stringify(params));
 
 const delegatePage = () => {
     const locationHash = window.location.hash || '#assignee-view';
@@ -440,7 +448,7 @@ const delegatePage = () => {
                 drawSeriesTable(data);
                 setEventsOnFooter(updateStatusLabel);
                 startShortcutsForListNav();
-                updateAssigneeName();
+                updateViews();
             }).catch(err => {
                 window.localStorage.clear();
                 console.log(err);
@@ -456,6 +464,7 @@ const delegatePage = () => {
                 setEventsOnFooter(moveToNextSeries);
                 setObserve();
                 startShortcutsForEpisodeNav();
+                rememberLastPosition({id: params.get('id'), idx: params.get('idx'), assignee: params.get('assignee')});
             }).catch(err => {
                 console.log(err);
                 alert('loadEpisodesData : Please try it again.');
