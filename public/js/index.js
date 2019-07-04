@@ -198,7 +198,8 @@ const drawSeriesTable = (data) => {
             filteredTrs.forEach(tr => tr.classList.add('d-none'));
             listed = total - filteredTrs.length;
         }
-        
+
+        window.localStorage.setItem('FV', this.value);
         updateCounts(total, listed);
     }
 
@@ -316,13 +317,17 @@ const moveToNextSeries = () => moveToSeries(true);
 const moveToSeries = (next) => {
     const db = window.localStorage;
     const series = JSON.parse(db.getItem(currentAssignee));
-    const pos = series.map(s => s.idx).indexOf(currentSeriesIdx);
+    const currentFilter = db.getItem('FV') || 'A';
+    const filteredSeries = series.filter(s => currentFilter === 'A' || s.status === currentFilter);
+    const pos = filteredSeries.map(s => s.idx)
+                    .indexOf(currentSeriesIdx);
+                    alert(currentFilter + pos)
     if (!next && pos === 0) {
         alert('This series is the first one.');
     } else if (next && series.length === pos -1) {
         alert('This series is the last one.');
     } else {
-        goToDetailedView(series[pos + (next ? 1 : -1)]);
+        goToDetailedView(filteredSeries[pos + (next ? 1 : -1)]);
     }
 }
 
