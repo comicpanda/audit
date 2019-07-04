@@ -321,7 +321,6 @@ const moveToSeries = (next) => {
     const filteredSeries = series.filter(s => currentFilter === 'A' || s.status === currentFilter);
     const pos = filteredSeries.map(s => s.idx)
                     .indexOf(currentSeriesIdx);
-                    alert(currentFilter + pos)
     if (!next && pos === 0) {
         alert('This series is the first one.');
     } else if (next && series.length === pos -1) {
